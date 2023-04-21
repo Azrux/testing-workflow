@@ -1,0 +1,10 @@
+.container {
+  height: calc(100vh - 40px);
+  margin: 20px;
+  border: 2px solid rgb(221, 220, 220);
+  border-radius: 10px;
+}
+
+.button {
+  margin: 10px;
+}
