@@ -2,16 +2,16 @@ name: Test workflow
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   lint:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-        name: Checkout [main]
+        name: Checkout [master]
         with:
           fetch-depth: 0
       - name: Install dependencies
