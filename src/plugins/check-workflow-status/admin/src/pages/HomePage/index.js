@@ -4,45 +4,79 @@
  *
  */
 
-import React from "react";
-// import PropTypes from 'prop-types';
-// import pluginId from '../../pluginId';
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Button, Stack } from "@strapi/design-system";
+import Workflows from "../../components/workflows";
+import Pagination from "../../components/pagination";
 import s from "./index.module.css";
+import { Button } from "@strapi/design-system";
+import Filter from "../../components/filter";
+
+// to get one: https://api.github.com/repos/Azrux/testing-workflow/actions/runs?per_page=1
+// to get all: https://api.github.com/repos/Azrux/testing-workflow/actions/runs
+// const headers = {
+//   Authorization: `token ${process.env.REACT_APP_TOKEN}`,
+//   "X-GitHub-Api-Version": "2022-11-28",
+// };
 
 const HomePage = () => {
+  const [workflows, setWorkflows] = useState();
+  const [slicedWorkflows, setSlicedWorkflows] = useState();
+  const [filteredWorkflows, setFilteredWorkflows] = useState();
+  const [filterSliced, setFilterSliced] = useState();
 
-  const config = {
-    headers: {
-      Authorization: `token ${process.env.REACT_APP_TOKEN}`,
-      'X-GitHub-Api-Version': '2022-11-28'
+  useEffect(() => {
+    if (filteredWorkflows) {
+      setFilterSliced([...filteredWorkflows].slice(0, 5));
+    } else if (workflows?.length) {
+      setSlicedWorkflows([...workflows].slice(0, 5));
     }
-  };
+  }, [workflows, filteredWorkflows]);
 
-  const handleOnClick = () => {
-    axios.get(`https://api.github.com/repos/Azrux/testing-workflow/actions/runs?per_page=1`)
-    .then((response) => {
-      console.log(response.data);
-    })
-    .catch((error) => {
-      console.log(error);
-    })
-  }
+  const getWorkflows = () => {
+    axios
+      .get(`https://api.github.com/repos/Azrux/testing-workflow/actions/runs`)
+      .then((response) => {
+        setWorkflows(response?.data?.workflow_runs);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
 
   return (
     <div className={s.container}>
-      <Button 
-        className={s.button}
-        onClick={handleOnClick}
-      >
-        Refresh workflows status
-      </Button>
-      <Stack spacing={4} background="secondary200" padding={3}>
-        <Box color="neutral800" background="primary100" padding={4}>
-          First
-        </Box>
-      </Stack>
+      <div className={s.header}>
+        <Button
+          className={s.button}
+          onClick={() => {
+            setWorkflows(getWorkflows());
+            setFilteredWorkflows(null);
+          }}
+        >
+          Refresh workflows status
+        </Button>
+        {workflows && (
+          <Filter
+            workflows={workflows}
+            setFilteredWorkflows={setFilteredWorkflows}
+            className={s.filter}
+          />
+        )}
+      </div>
+      {workflows && (
+        <>
+          <Workflows
+            workflows={filterSliced ? filterSliced : slicedWorkflows}
+          />
+          <Pagination
+            workflows={workflows}
+            setSlicedWorkflows={setSlicedWorkflows}
+            filteredWorkflows={filteredWorkflows}
+            setFilterSliced={setFilterSliced}
+          />
+        </>
+      )}
     </div>
   );
 };
