@@ -15,13 +15,13 @@ import { Octokit } from "@octokit/core";
 
 const HomePage = () => {
   const [workflows, setWorkflows] = useState();
-  const [counter, setCounter] = useState(0);
-  const [status, setStatus] = useState("completed");
+  const [ internalInterval, setInternalInterval ] = useState();
 
   const octokit = new Octokit({
-    auth: "",
+    auth: "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",
   });
 
+  // POST a new workflow
   const dispatchWorkflow = async () => {
     try {
       const owner = "Azrux";
@@ -42,25 +42,28 @@ const HomePage = () => {
           headers,
         }
       );
-      setWorkflows(null);
-      setStatus(null);
+      setTimeout(() => {
+        const intervalId = setInterval(() => {
+          getLastWorkflow();
+        }
+        , 5000);
+        setInternalInterval(intervalId);
+      }, 40000);
+      setWorkflows({id: "pending", status: "queued", conclusion: "pending"}); 
     } catch (error) {
       console.error(error);
     }
   };
 
+  // GET last workflow
   const getLastWorkflow = async () => {
     try {
-      const headers= {
-        "X-GitHub-Api-Version": "2022-11-28",
-      }
       const response = await octokit.request(
-        "GET /repos/Azrux/testing-workflow/actions/runs?per_page=1", { headers }
+        "GET /repos/Azrux/testing-workflow/actions/runs?per_page=1"
       );
       const workflow = response.data.workflow_runs[0];
       setWorkflows(workflow);
-      setStatus(workflow.status)
-      setCounter(counter + 1)
+      console.log(response.data)
     } catch (error) {
       console.error(error);
     }
@@ -70,14 +73,11 @@ const HomePage = () => {
     if (!workflows) {
       getLastWorkflow();
     } else {
-      let intervalId = setInterval(() => {
-        if (status !== "completed") {
-          getLastWorkflow();
-        }
-      }, 5000);
-      return () => clearInterval(intervalId);
+      if (internalInterval && workflows.status === "completed") {
+        clearInterval(internalInterval);
+      }
     }
-  }, [workflows, counter, status]);
+  }, [workflows]);
 
   return (
     <div className={s.container}>
@@ -85,9 +85,12 @@ const HomePage = () => {
         <Button
           onClick={dispatchWorkflow}
           className={s.button}
-          disabled={workflows && workflows.status !== "completed"}
+          loading={workflows && workflows.status !== "completed"}
         >
           Dispatch workflow
+        </Button>
+        <Button onClick={getLastWorkflow}>
+          Get last workflow
         </Button>
       </div>
       {workflows && <Workflows workflows={workflows} />}
