@@ -18,7 +18,7 @@ const HomePage = () => {
   const [ internalInterval, setInternalInterval ] = useState();
 
   const octokit = new Octokit({
-    auth: "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",
+    auth: "",
   });
 
   // POST a new workflow
