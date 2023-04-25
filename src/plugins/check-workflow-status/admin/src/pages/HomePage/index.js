@@ -19,7 +19,7 @@ const HomePage = () => {
   const [status, setStatus] = useState("completed");
 
   const octokit = new Octokit({
-    auth: "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",
+    auth: "",
   });
 
   const dispatchWorkflow = async () => {
