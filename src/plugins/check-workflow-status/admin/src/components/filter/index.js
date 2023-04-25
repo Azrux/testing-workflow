@@ -2,9 +2,16 @@ import React, { useEffect, useState } from "react";
 import { Option, Select } from "@strapi/design-system";
 import s from "./index.module.css";
 
-const Filter = ({ workflows, setFilteredWorkflows }) => {
-  const [filterByStatus, setFilterByStatus] = useState('');
-  const [filterByConclusion, setFilterByConclusion] = useState('');
+const Filter = ({ workflows, setFilteredWorkflows, filteredWorkflows }) => {
+  const [filterByStatus, setFilterByStatus] = useState(null);
+  const [filterByConclusion, setFilterByConclusion] = useState(null);
+
+  useEffect(() => {
+    if(filteredWorkflows === null) {
+      setFilterByStatus(null);
+      setFilterByConclusion(null);
+    }
+  }, [filteredWorkflows]);
 
   useEffect(() => {
     if (filterByStatus) {

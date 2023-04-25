@@ -5,15 +5,15 @@ const Workflows = ({ workflows }) => {
   return (
     <>
       <Stack spacing={4} background="secondary200" padding={3}>
-        {workflows?.map((workflow) => {
-          return (
+        {workflows && (
             <Box color="neutral800" background="primary100" padding={4}>
-              <h3>{workflow.display_title}</h3>
-              <p>Status: {workflow.status}</p>
-              <p>Conclusion: {workflow.conclusion}</p>
+              <p>Id: {workflows.id}</p>
+              <br />
+              <p>{workflows.display_title}</p>
+              <p>Status: {workflows.status}</p>
+              <p>Conclusion: {workflows.conclusion}</p>
             </Box>
-          );
-        })}
+          )}
       </Stack>
     </>
   );
